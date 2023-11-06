@@ -1,5 +1,6 @@
 package uk.ac.ed.inf;
 
+import uk.ac.ed.inf.ilp.constant.OrderStatus;
 import uk.ac.ed.inf.ilp.constant.OrderValidationCode;
 import uk.ac.ed.inf.ilp.constant.SystemConstants;
 import uk.ac.ed.inf.ilp.data.CreditCardInformation;
@@ -13,9 +14,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-/**
- * a sample order validator which does nothing
- */
+
 public class OrderValidator implements OrderValidation {
     @Override
     public Order validateOrder(Order orderToValidate, Restaurant[] definedRestaurants) {
@@ -27,50 +26,60 @@ public class OrderValidator implements OrderValidation {
         //checks number of pizzas in valid
         int NumofPizzas = orderToValidate.getPizzasInOrder().length;
         if (NumofPizzas > SystemConstants.MAX_PIZZAS_PER_ORDER) {
+            orderToValidate.setOrderStatus(OrderStatus.INVALID);
             //returns validation code for this case
             return OrderValidationCode.MAX_PIZZA_COUNT_EXCEEDED;
         }
         //uses the CreditCardNumVal function to validate card number
         if (CreditCardNumVal(orderToValidate.getCreditCardInformation())) {
+            orderToValidate.setOrderStatus(OrderStatus.INVALID);
             //returns validation code for this case
             return OrderValidationCode.CARD_NUMBER_INVALID;
         }
         //uses the CreditCardCVVVal function to validate CVV number
         if (CreditCardCVVVal(orderToValidate.getCreditCardInformation())) {
+            orderToValidate.setOrderStatus(OrderStatus.INVALID);
             //returns validation code for this case
             return OrderValidationCode.CVV_INVALID;
         }
         //uses the CreditCardDateVal function to validate card expiry date
         if (CreditCardDateVal(orderToValidate.getCreditCardInformation(), orderToValidate.getOrderDate())) {
+            orderToValidate.setOrderStatus(OrderStatus.INVALID);
             //returns validation code for this case
             return OrderValidationCode.EXPIRY_DATE_INVALID;
         }
         //uses the priceInPenceCheck function to validate that the order price is correct
         if (priceInPenceCheck(orderToValidate.getPizzasInOrder(), orderToValidate.getPriceTotalInPence())) {
+            orderToValidate.setOrderStatus(OrderStatus.INVALID);
             //returns validation code for this case
             return OrderValidationCode.TOTAL_INCORRECT;
         }
         //uses the mulRestaurantsVal function to check if the pizzas are from multiple restaurants
         if (mulRestaurantsVal(orderToValidate.getPizzasInOrder(), definedRestaurants) == 0) {
+            orderToValidate.setOrderStatus(OrderStatus.INVALID);
             //returns validation code for this case
             return OrderValidationCode.PIZZA_FROM_MULTIPLE_RESTAURANTS;
         }
         //uses the mulRestaurantsVal function to check if the pizzas are defined on a restaurants menu
         if (mulRestaurantsVal(orderToValidate.getPizzasInOrder(), definedRestaurants) == 2) {
+            orderToValidate.setOrderStatus(OrderStatus.INVALID);
             //returns validation code for this case
             return OrderValidationCode.PIZZA_NOT_DEFINED;
         }
         //case of the function mulRestaurantsVal that catches undefined behaviour
         if (mulRestaurantsVal(orderToValidate.getPizzasInOrder(), definedRestaurants) == 3) {
+            orderToValidate.setOrderStatus(OrderStatus.INVALID);
             //returns validation code for this case
             return OrderValidationCode.UNDEFINED;
         }
         //uses the isClosed function to check if the restaurant the order is from is open
         if (isClosed(getPizzaRestaurant(orderToValidate.getPizzasInOrder()[0], definedRestaurants), orderToValidate.getOrderDate())) {
+            orderToValidate.setOrderStatus(OrderStatus.INVALID);
             //returns validation code for this case
             return OrderValidationCode.RESTAURANT_CLOSED;
         }
         //returns no error if all tests are passed
+        orderToValidate.setOrderStatus(OrderStatus.VALID_BUT_NOT_DELIVERED);
         return OrderValidationCode.NO_ERROR;
     }
 

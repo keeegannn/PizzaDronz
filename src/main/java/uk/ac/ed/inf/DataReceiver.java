@@ -1,9 +1,16 @@
 package uk.ac.ed.inf;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import uk.ac.ed.inf.ilp.constant.OrderValidationCode;
 import uk.ac.ed.inf.ilp.data.LngLat;
 import uk.ac.ed.inf.ilp.data.NamedRegion;
@@ -12,19 +19,20 @@ import uk.ac.ed.inf.ilp.data.Restaurant;
 public class DataReceiver {
     public static Restaurant[] restaurants;
     public static Order[] orders;
-    public static NamedRegion[] no_fly_zones;
+    public static HashSet<NamedRegion> no_fly_zones;
     public static NamedRegion central_area;
-    public static FlightPath[] order_paths;
+    public static List<LngLat>[] order_paths;
     public static final LngLat appleton = new LngLat(-3.186874, 55.944494);
+    public static boolean alive;
 
     public static void main(String[] args) {
-        if (args.length < 1){
+        if (args.length < 1) {
             System.err.println("the base URL must be provided");
             System.exit(1);
         }
 
         var baseUrl = args[0];
-        if (!baseUrl.endsWith("/")){
+        if (!baseUrl.endsWith("/")) {
             baseUrl += "/";
         }
 
@@ -40,38 +48,39 @@ public class DataReceiver {
         mapper.registerModule(new JavaTimeModule());
         try {
             restaurants = mapper.readValue(new URL(baseUrl + scheme_specific.RESTAURANT_URL), Restaurant[].class);
-            System.out.println("read all restaurants");
+            //read the restaurant list
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         try {
             orders = mapper.readValue(new URL(baseUrl + scheme_specific.ORDER_URL), Order[].class);
-            System.out.println("read all orders");
+            //read the orders
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         try {
-            no_fly_zones = mapper.readValue(new URL(baseUrl + scheme_specific.NO_FLY_ZONE_URL), NamedRegion[].class);
-            System.out.println("read all no fly zones");
+            no_fly_zones = mapper.readValue(new URL(baseUrl + scheme_specific.NO_FLY_ZONE_URL), new TypeReference<>() {
+            });
+            //read all no fly zones
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         try {
             central_area = mapper.readValue(new URL(baseUrl + scheme_specific.CENTRAL_AREA_URL), NamedRegion.class);
-            System.out.println("read all no fly zones");
+            //read the central area
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            alive = mapper.readValue(new URL(baseUrl + scheme_specific.IS_ALIVE_URL), Boolean.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         OrderValidator orderValidator = new OrderValidator();
-        PathFinder pathFinder = new PathFinder(appleton);
-        for (int i = 0; i < orders.length; i++) {
-            orderValidator.validateOrder(orders[i], restaurants);
-            if(orders[i].getOrderValidationCode() == OrderValidationCode.NO_ERROR) {
-                order_paths[i] = pathFinder.findpath(orders[i], orderValidator.getPizzaRestaurant(orders[i].getPizzasInOrder()[0], restaurants), no_fly_zones, central_area);
-                pathFinder.nextpath();
-            }
-            else{
-                order_paths[i] = null;
+        LngLatHandler lngLatHandler = new LngLatHandler();
+        if (alive) {
+            for (Order order : orders) {
+
             }
         }
     }

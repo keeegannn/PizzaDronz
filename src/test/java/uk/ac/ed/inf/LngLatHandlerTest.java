@@ -23,7 +23,7 @@ LngLatHandler lngLatHandler = new LngLatHandler();
     }
 
     public void testIsInCentralArea() {
-        LngLat pointInside = new LngLat(0.5, 0.5);
+        LngLat pointInside = new LngLat(0, 0);
         LngLat[] vertices = new LngLat[]{new LngLat(0.0, 1.0),new LngLat(0.0, 0.0), new LngLat(1.0, 0.0), new LngLat(1.0, 1.0)};
         NamedRegion centralArea = new NamedRegion("Central Area", vertices);
         boolean isInCentralArea = lngLatHandler.isInCentralArea(pointInside, centralArea);
