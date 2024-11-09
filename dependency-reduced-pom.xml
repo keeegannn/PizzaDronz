@@ -1,24 +1,17 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
-    <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
+    <groupId>org.springframework.boot</groupId>
     <version>3.1.4</version>
-    <relativePath/>
+    <relativePath>pom.xml</relativePath>
   </parent>
+  <modelVersion>4.0.0</modelVersion>
   <groupId>uk.ac.ed.inf</groupId>
   <artifactId>PizzaDronz</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
-
   <name>PizzaDronz</name>
+  <version>1.0-SNAPSHOT</version>
   <url>http://maven.apache.org</url>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>18</maven.compiler.source>
-    <maven.compiler.target>18</maven.compiler.target>
-  </properties>
   <build>
     <plugins>
       <plugin>
@@ -26,9 +19,20 @@
         <artifactId>spring-boot-maven-plugin</artifactId>
         <version>2.6.2</version>
       </plugin>
+      <plugin>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.5.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
-
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -40,44 +44,62 @@
       <groupId>uk.ac.ed.inf.ilp</groupId>
       <artifactId>PizzaDronz</artifactId>
       <version>1.0-SNAPSHOT</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/lib/IlpDataObjects.jar</systemPath>
+      <scope>provided</scope>
+      <systemPath>C:\comp sys\.vscode\ILP\PizzaDronz/lib/IlpDataObjects.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
       <version>3.1.5</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
       <version>RELEASE</version>
-      <scope>compile</scope>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>2.10.1</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>IlpDataObjects</groupId>
       <artifactId>IlpDataObjects</artifactId>
       <version>1</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
       <version>2.15.3</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
       <version>2.15.3</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jsr310</artifactId>
       <version>2.13.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>uk.ac.ed.inf.ilp</groupId>
+      <artifactId>PizzaDronz</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/lib/IlpDataObjects.jar</systemPath>
     </dependency>
   </dependencies>
+  <properties>
+    <maven.compiler.target>18</maven.compiler.target>
+    <maven.compiler.source>18</maven.compiler.source>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
 </project>

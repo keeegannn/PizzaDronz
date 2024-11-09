@@ -1,6 +1,7 @@
 package uk.ac.ed.inf;
 
 public class scheme_specific {
+    //API specific URLS
     public static final String RESTAURANT_URL = "restaurants";
     public static final String ORDER_URL = "orders";
     public static final String CENTRAL_AREA_URL = "centralArea";

@@ -9,7 +9,6 @@ import uk.ac.ed.inf.ilp.data.Pizza;
 import uk.ac.ed.inf.ilp.data.Restaurant;
 import uk.ac.ed.inf.ilp.interfaces.OrderValidation;
 import java.time.LocalDate;
-import java.time.DayOfWeek;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -150,7 +149,7 @@ public class OrderValidator implements OrderValidation {
             total += pizza.priceInPence();
         }
         //adds the £1 delivery fee
-        total += 100;
+        total += SystemConstants.ORDER_CHARGE_IN_PENCE;
         //compare the total of the Pizza prices against the order price
         return total != OrderPrice; //returns inverse as it used in an if statement to check for invalidity
     }

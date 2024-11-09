@@ -1,5 +1,5 @@
 package uk.ac.ed.inf;
-import uk.ac.ed.inf.ilp.constant.CentralRegionVertexOrder;
+
 import uk.ac.ed.inf.ilp.constant.SystemConstants;
 import uk.ac.ed.inf.ilp.data.LngLat;
 import uk.ac.ed.inf.ilp.data.NamedRegion;
@@ -18,12 +18,7 @@ public class LngLatHandler implements LngLatHandling{
     @Override
     public boolean isCloseTo(LngLat startPosition, LngLat otherPosition) {
         //used distanceTo function to check if the drone is startPosition to otherPosition
-        if (distanceTo(startPosition, otherPosition) <= SystemConstants.DRONE_IS_CLOSE_DISTANCE){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return distanceTo(startPosition, otherPosition) <= SystemConstants.DRONE_IS_CLOSE_DISTANCE;
     }
 
     @Override
@@ -73,21 +68,57 @@ public class LngLatHandler implements LngLatHandling{
         // Return the new longitude and latitude as a LngLat object
         return new LngLat(NewLng, NewLat);
     }
-    public LngLat nextPosition(LngLat startPosition, double angle, Double multiplier){
-        // Convert degrees to radians
-        double angleInRadians = Math.toRadians(angle);
-
-        // Calculate new longitude using the angle and movement distance
-        double NewLng = startPosition.lng() + (SystemConstants.DRONE_MOVE_DISTANCE * Math.cos(angleInRadians) * multiplier);
-        // Calculate new latitude using the angle and movement distance
-        double NewLat = startPosition.lat() + (SystemConstants.DRONE_MOVE_DISTANCE * Math.sin(angleInRadians) * multiplier);
-
-        // Return the new longitude and latitude as a LngLat object
-        return new LngLat(NewLng, NewLat);
+    public LngLat findClosestPoint(LngLat position, NamedRegion central){
+        //intializes the closest point and distance
+        LngLat closestpoint = central.vertices()[0];
+        double lowestdistance = distanceTo(position, closestpoint);
+        //loops through every vertice in the area and finds the closes point on the perimeter of central area
+        for(int i = 0; i < 3; i++){
+            if(distanceTo(position, findClosestPointOnEdge(position, central.vertices()[i], central.vertices()[i + 1])) < lowestdistance){
+                lowestdistance = distanceTo(position, findClosestPointOnEdge(position, central.vertices()[i], central.vertices()[i + 1]));
+                closestpoint = findClosestPointOnEdge(position, central.vertices()[i], central.vertices()[i + 1]);
+            }
+            if(distanceTo(position, central.vertices()[i]) < lowestdistance){
+                lowestdistance = distanceTo(position, central.vertices()[i]);
+                closestpoint = central.vertices()[i];
+            }
+        }
+        return closestpoint;
     }
-    public LngLat findCentreOfRectangle(NamedRegion central){
-        double midLat = (central.vertices()[CentralRegionVertexOrder.TOP_RIGHT].lat() + central.vertices()[CentralRegionVertexOrder.BOTTOM_RIGHT].lat())/ 2;
-        double midLng = (central.vertices()[CentralRegionVertexOrder.BOTTOM_LEFT].lng() + central.vertices()[CentralRegionVertexOrder.BOTTOM_RIGHT].lng())/ 2;
-        return new LngLat(midLng, midLat);
+    public LngLat findClosestPointOnEdge(LngLat point, LngLat start, LngLat end) {
+        // Extracting coordinates of the start point
+        double x1 = start.lng();
+        double y1 = start.lat();
+
+        // Extracting coordinates of the end point
+        double x2 = end.lng();
+        double y2 = end.lat();
+
+        // Extracting coordinates of the given point
+        double x0 = point.lng();
+        double y0 = point.lat();
+
+        double x, y; // Variables to store the coordinates of the closest point on the edge
+
+        // Calculating the parameter 'u' to determine the position of the closest point on the edge
+        double u = ((x0 - x1) * (x2 - x1) + (y0 - y1) * (y2 - y1)) / ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+
+        // Checking different cases based on the value of 'u'
+        if (u < 0) {
+            // The closest point is before the start of the edge, so set it to the start point
+            x = x1;
+            y = y1;
+        } else if (u > 1) {
+            // The closest point is after the end of the edge, so set it to the end point
+            x = x2;
+            y = y2;
+        } else {
+            // The closest point is between the start and end points, so interpolate the coordinates
+            x = x1 + u * (x2 - x1);
+            y = y1 + u * (y2 - y1);
+        }
+
+        // Creating a new LngLat object with the coordinates of the closest point and returning it
+        return new LngLat(x, y);
     }
 }
